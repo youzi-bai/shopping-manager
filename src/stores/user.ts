@@ -1,58 +1,83 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { User } from '@/types'
-import { getUser, createUser, getRecordCount, getDayCount } from '@/utils/db'
+import { api } from '@/utils/api'
 
 export const useUserStore = defineStore('user', () => {
-  const user = ref<User | null>(null)
-  const recordCount = ref(0)
-  const dayCount = ref(0)
+  const user = ref<{ id: number; phone: string; nickname: string; avatar_url: string } | null>(null)
+  const token = ref<string | null>(null)
   const isLoading = ref(false)
 
-  // 加载用户
-  const loadUser = async () => {
+  // 检查登录状态
+  const checkLogin = () => {
+    const savedToken = uni.getStorageSync('token')
+    const savedUser = uni.getStorageSync('user')
+    if (savedToken && savedUser) {
+      token.value = savedToken
+      user.value = savedUser
+      return true
+    }
+    return false
+  }
+
+  // 发送验证码
+  const sendSms = async (phone: string) => {
+    const res = await api.sendSms(phone)
+    return res.code // 测试用，返回验证码
+  }
+
+  // 验证码登录
+  const login = async (phone: string, code: string) => {
     isLoading.value = true
     try {
-      let userData = await getUser(1)
-
-      if (!userData) {
-        // 创建默认用户
-        const now = new Date().toISOString()
-        await createUser({
-          nickname: '摆摆',
-          createdAt: now
-        })
-        userData = await getUser(1)
-      }
-
-      user.value = userData || { id: 1, nickname: '摆摆' }
-
-      // 获取统计数据
-      recordCount.value = await getRecordCount()
-      dayCount.value = await getDayCount()
+      const res = await api.login(phone, code)
+      user.value = res.user
+      token.value = res.token
+      uni.setStorageSync('token', res.token)
+      uni.setStorageSync('user', res.user)
     } finally {
       isLoading.value = false
     }
   }
 
-  // 更新用户
-  const updateUser = async (updatedUser: User) => {
-    user.value = updatedUser
-    // TODO: 保存到数据库
+  // 微信登录
+  const wxLogin = async (code: string) => {
+    isLoading.value = true
+    try {
+      const res = await api.wxLogin(code)
+      user.value = res.user
+      token.value = res.token
+      uni.setStorageSync('token', res.token)
+      uni.setStorageSync('user', res.user)
+    } finally {
+      isLoading.value = false
+    }
   }
 
-  // 刷新统计
-  const refreshStats = async () => {
-    await loadUser()
+  // 更新用户信息
+  const updateUser = async (data: { nickname?: string; avatar_url?: string }) => {
+    if (!user.value) return
+    const updated = await api.updateUser(user.value.id, data)
+    user.value = updated
+    uni.setStorageSync('user', updated)
+  }
+
+  // 登出
+  const logout = () => {
+    user.value = null
+    token.value = null
+    uni.removeStorageSync('token')
+    uni.removeStorageSync('user')
   }
 
   return {
     user,
-    recordCount,
-    dayCount,
+    token,
     isLoading,
-    loadUser,
+    checkLogin,
+    sendSms,
+    login,
+    wxLogin,
     updateUser,
-    refreshStats
+    logout
   }
 })

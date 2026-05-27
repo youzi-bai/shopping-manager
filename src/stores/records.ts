@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { ProductRecord } from '@/types'
-import { getRecords, addRecord as dbAddRecord, deleteRecord as dbDeleteRecord, getTotalAmount } from '@/utils/db'
+import { api } from '@/utils/api'
+import { useUserStore } from './user'
 
 export const useRecordsStore = defineStore('records', () => {
-  const records = ref<ProductRecord[]>([])
+  const records = ref<Record[]>([])
   const isLoading = ref(false)
 
   // 本月消费总额
@@ -14,10 +14,7 @@ export const useRecordsStore = defineStore('records', () => {
     const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59)
 
     return records.value
-      .filter(r => {
-        const date = new Date(r.purchaseTime)
-        return date >= monthStart && date <= monthEnd
-      })
+      .filter(r => new Date(r.purchase_time!) >= monthStart && new Date(r.purchase_time!) <= monthEnd)
       .reduce((sum, r) => sum + r.price * r.quantity, 0)
   })
 
@@ -28,10 +25,7 @@ export const useRecordsStore = defineStore('records', () => {
     const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59)
 
     return records.value
-      .filter(r => {
-        const date = new Date(r.purchaseTime)
-        return date >= lastMonthStart && date <= lastMonthEnd
-      })
+      .filter(r => new Date(r.purchase_time!) >= lastMonthStart && new Date(r.purchase_time!) <= lastMonthEnd)
       .reduce((sum, r) => sum + r.price * r.quantity, 0)
   })
 
@@ -44,35 +38,50 @@ export const useRecordsStore = defineStore('records', () => {
   // 最近记录
   const recentRecords = computed(() => {
     return [...records.value]
-      .sort((a, b) => new Date(b.purchaseTime).getTime() - new Date(a.purchaseTime).getTime())
+      .sort((a, b) => new Date(b.purchase_time!).getTime() - new Date(a.purchase_time!).getTime())
       .slice(0, 8)
   })
 
   // 按分类筛选记录
-  const getRecordsByCategory = (categoryId: string) => {
-    return records.value.filter(r => r.categoryId === categoryId)
+  const getRecordsByCategory = (categoryId: number) => {
+    return records.value.filter(r => r.category_id === categoryId)
   }
 
   // 加载记录
-  const loadRecords = async (categoryId?: string) => {
+  const loadRecords = async (categoryId?: number) => {
     isLoading.value = true
     try {
-      records.value = await getRecords(categoryId)
+      const userStore = useUserStore()
+      records.value = await api.getRecords({
+        user_id: userStore.user?.id,
+        category_id: categoryId
+      })
     } finally {
       isLoading.value = false
     }
   }
 
   // 添加记录
-  const addRecord = async (record: ProductRecord) => {
-    await dbAddRecord(record)
-    await loadRecords()
+  const addRecord = async (record: Omit<Record, 'id' | 'created_at'>) => {
+    const userStore = useUserStore()
+    const newRecord = await api.addRecord({
+      ...record,
+      user_id: userStore.user!.id,
+      purchase_time: record.purchase_time || new Date().toISOString()
+    })
+    records.value.unshift(newRecord)
   }
 
   // 删除记录
   const deleteRecord = async (id: number) => {
-    await dbDeleteRecord(id)
-    await loadRecords()
+    await api.deleteRecord(id)
+    records.value = records.value.filter(r => r.id !== id)
+  }
+
+  // 获取月度统计
+  const getMonthlyStats = async (year: number, month: number) => {
+    const userStore = useUserStore()
+    return api.getMonthlyStats(year, month, userStore.user?.id)
   }
 
   return {
@@ -85,6 +94,21 @@ export const useRecordsStore = defineStore('records', () => {
     getRecordsByCategory,
     loadRecords,
     addRecord,
-    deleteRecord
+    deleteRecord,
+    getMonthlyStats
   }
 })
+
+interface Record {
+  id?: number
+  name: string
+  price: number
+  quantity: number
+  purchase_time?: string
+  store_name?: string
+  category_id?: number
+  platform_id?: string
+  remark?: string
+  user_id: number
+  created_at?: string
+}
