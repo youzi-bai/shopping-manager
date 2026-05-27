@@ -1,0 +1,144 @@
+/* 购物管理APP全局样式 */
+
+:root {
+  /* 色彩规范 */
+  --primary-color: #FF8A80;
+  --secondary-color: #A8E6CF;
+  --warning-color: #FF6B6B;
+  --success-color: #9BBB59;
+  --background-color: #FFF9F5;
+  --card-color: #FFFFFF;
+  --primary-text: #333333;
+  --secondary-text: #999999;
+  --divider-color: #F0EDE8;
+
+  /* 分类专属色 */
+  --category-food: #FFF3E0;
+  --category-clothing: #E8F5E9;
+  --category-digital: #E3F2FD;
+  --category-daily: #FFF8E1;
+  --category-beauty: #FCE4EC;
+  --category-entertainment: #F3E5F5;
+  --category-transport: #E0F7FA;
+  --category-education: #FFF9C4;
+  --category-medical: #FFEBEE;
+  --category-other: #F5F5F5;
+
+  /* 间距与圆角 */
+  --page-padding: 16px;
+  --card-radius: 16px;
+  --button-radius: 24px;
+  --input-radius: 12px;
+  --bottom-nav-height: 56px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+page {
+  background-color: var(--background-color);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+  color: var(--primary-text);
+  height: 100%;
+}
+
+view, text {
+  line-height: 1.5;
+}
+
+/* 容器 */
+.container {
+  padding: var(--page-padding);
+  min-height: 100vh;
+}
+
+/* 卡片 */
+.card {
+  background-color: var(--card-color);
+  border-radius: var(--card-radius);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+/* 按钮 */
+.btn-primary {
+  background-color: var(--primary-color);
+  color: #FFFFFF;
+  border: none;
+  border-radius: var(--button-radius);
+  padding: 12px 32px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.btn-outline {
+  border: 1px solid var(--divider-color);
+  background-color: transparent;
+  border-radius: var(--input-radius);
+  padding: 12px 16px;
+}
+
+/* 输入框 */
+.input {
+  background-color: var(--card-color);
+  border: 1px solid var(--divider-color);
+  border-radius: var(--input-radius);
+  padding: 12px 16px;
+  font-size: 15px;
+}
+
+.input:focus {
+  border-color: var(--primary-color);
+  outline: none;
+}
+
+/* 分割线 */
+.divider {
+  height: 1px;
+  background-color: var(--divider-color);
+}
+
+/* 文字 */
+.text-primary {
+  color: var(--primary-text);
+}
+
+.text-secondary {
+  color: var(--secondary-text);
+}
+
+.text-price {
+  color: var(--primary-text);
+  font-weight: 600;
+}
+
+/* flex辅助 */
+.flex {
+  display: flex;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+/* 安全区域 */
+.safe-area-bottom {
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
+}

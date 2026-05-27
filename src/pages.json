@@ -1,0 +1,83 @@
+{
+    "pages" : [
+        {
+            "path" : "pages/index/index",
+            "style" : {
+                "navigationBarTitleText" : "首页",
+                "navigationStyle" : "custom"
+            }
+        },
+        {
+            "path" : "pages/categories/index",
+            "style" : {
+                "navigationBarTitleText" : "分类",
+                "navigationStyle" : "custom"
+            }
+        },
+        {
+            "path" : "pages/bill/index",
+            "style" : {
+                "navigationBarTitleText" : "账单",
+                "navigationStyle" : "custom"
+            }
+        },
+        {
+            "path" : "pages/mine/index",
+            "style" : {
+                "navigationBarTitleText" : "我的",
+                "navigationStyle" : "custom"
+            }
+        },
+        {
+            "path" : "pages/add-record/index",
+            "style" : {
+                "navigationBarTitleText" : "记一笔",
+                "navigationStyle" : "custom"
+            }
+        },
+        {
+            "path" : "pages/ocr-record/index",
+            "style" : {
+                "navigationBarTitleText" : "拍照识别",
+                "navigationStyle" : "custom"
+            }
+        },
+        {
+            "path" : "pages/edit-profile/index",
+            "style" : {
+                "navigationBarTitleText" : "编辑资料",
+                "navigationStyle" : "custom"
+            }
+        },
+        {
+            "path" : "pages/bill-detail/index",
+            "style" : {
+                "navigationBarTitleText" : "消费明细",
+                "navigationStyle" : "custom"
+            }
+        },
+        {
+            "path" : "App",
+            "style" : {}
+        }
+    ],
+    "globalStyle" : {
+        "navigationBarTextStyle" : "black",
+        "navigationBarTitleText" : "购物管理",
+        "navigationBarBackgroundColor" : "#FFF9F5",
+        "backgroundColor" : "#FFF9F5"
+    },
+    "tabBar" : {
+        "color" : "#999999",
+        "selectedColor" : "#FF8A80",
+        "backgroundColor" : "#FFFFFF",
+        "borderStyle" : "white",
+        "list" : []
+    },
+    "easycom" : {
+        "autoscan" : true,
+        "custom" : {
+            "^uni-(.*)" : "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue"
+        }
+    }
+}
