@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from app.api import users, categories, records
 from app.core.database import engine, Base
 from app.models.models import Category
@@ -6,6 +7,14 @@ from app.models.models import Category
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="购物管理系统 API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 def init_default_categories(db):
